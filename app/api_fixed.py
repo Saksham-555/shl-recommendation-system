@@ -21,7 +21,7 @@ load_dotenv()
 # Initialize Google Gemini (free tier)
 try:
     genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-    model = genai.GenerativeModel('ggemini-1.5-flash')
+    model = genai.GenerativeModel('gemini-1.5-flash')
 except Exception as e:
     print(f"Warning: Gemini initialization failed: {e}")
     model = None
