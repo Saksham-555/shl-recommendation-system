@@ -1,0 +1,26 @@
+# Environment
+.env
+venv/
+env/
+__pycache__/
+*.pyc
+
+# ChromaDB
+app/chroma_db/
+
+# Data
+*.json
+!requirements.txt
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Results
+evaluation_results_*.json
+test_predictions.csv
