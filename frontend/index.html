@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHL Assessment Recommender - AI-Powered</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 50px 40px;
+            text-align: center;
+        }
+        
+        .header h1 { 
+            font-size: 3em; 
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .header p { 
+            font-size: 1.3em; 
+            opacity: 0.95;
+            font-weight: 300;
+        }
+        
+        .badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            margin-top: 15px;
+            font-size: 0.9em;
+        }
+        
+        .content { padding: 40px; }
+        
+        .input-section {
+            background: #f8f9fa;
+            padding: 35px;
+            border-radius: 15px;
+            margin-bottom: 35px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        
+        .input-section h2 {
+            margin-bottom: 20px;
+            color: #2c3e50;
+            font-size: 1.5em;
+        }
+        
+        textarea {
+            width: 100%;
+            min-height: 160px;
+            padding: 18px;
+            border: 2px solid #dee2e6;
+            border-radius: 12px;
+            font-size: 1.05em;
+            font-family: inherit;
+            resize: vertical;
+            transition: all 0.3s;
+        }
+        
+        textarea:focus { 
+            outline: none; 
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 16px 35px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover { 
+            transform: translateY(-3px); 
+            box-shadow: 0 12px 24px rgba(102,126,234,0.4); 
+        }
+        
+        .btn-secondary { 
+            background: #6c757d; 
+            color: white; 
+        }
+        
+        .btn-secondary:hover { 
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 60px 40px;
+            display: none;
+        }
+        
+        .spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #667eea;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 25px;
+        }
+        
+        @keyframes spin { 
+            0% { transform: rotate(0deg); } 
+            100% { transform: rotate(360deg); } 
+        }
+        
+        .results { display: none; }
+        
+        .results-header {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .results-header h2 {
+            color: #2c3e50;
+            font-size: 1.8em;
+            margin-bottom: 10px;
+        }
+        
+        .results-stats {
+            display: flex;
+            gap: 20px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-badge {
+            background: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 0.95em;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+        }
+        
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.85em;
+        }
+        
+        .stat-value {
+            font-weight: 700;
+            color: #667eea;
+            font-size: 1.3em;
+        }
+        
+        .result-card {
+            background: #fff;
+            border: 2px solid #e9ecef;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 25px;
+            transition: all 0.3s;
+        }
+        
+        .result-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 8px 20px rgba(102,126,234,0.15);
+            transform: translateY(-3px);
+        }
+        
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 20px;
+            gap: 20px;
+        }
+        
+        .result-rank {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1em;
+            flex-shrink: 0;
+        }
+        
+        .result-title {
+            font-size: 1.4em;
+            color: #2c3e50;
+            font-weight: 600;
+            flex: 1;
+            line-height: 1.3;
+        }
+        
+        .result-score {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 18px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.95em;
+            white-space: nowrap;
+        }
+        
+        .result-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .meta-item {
+            background: #f8f9fa;
+            padding: 12px 16px;
+            border-radius: 10px;
+            border-left: 3px solid #667eea;
+        }
+        
+        .meta-label {
+            font-size: 0.85em;
+            color: #6c757d;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+        
+        .meta-value {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 1.05em;
+        }
+        
+        .result-description {
+            color: #495057;
+            line-height: 1.7;
+            margin: 20px 0;
+            font-size: 1.02em;
+        }
+        
+        .ai-insights {
+            background: linear-gradient(135deg, #e7f3ff 0%, #f0e7ff 100%);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border-left: 4px solid #667eea;
+        }
+        
+        .ai-insights-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .ai-insights-content {
+            color: #495057;
+            white-space: pre-line;
+            line-height: 1.6;
+        }
+        
+        .result-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .result-link:hover { 
+            background: #764ba2;
+            transform: translateX(5px);
+        }
+        
+        .error-message {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            color: #856404;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 { font-size: 2em; }
+            .button-group { flex-direction: column; }
+            .result-header { flex-direction: column; align-items: stretch; }
+            .result-meta { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 SHL Assessment Recommender</h1>
+            <p>AI-powered recommendations from 377+ Individual Test Solutions</p>
+            <span class="badge">Powered by RAG & Gemini AI</span>
+        </div>
+        
+        <div class="content">
+            <div class="input-section">
+                <h2>📝 Enter Job Description or Query</h2>
+                <textarea id="queryInput" placeholder="Example: I am hiring for Java developers who can also collaborate effectively with my business teams. Need assessments for both technical skills and soft skills within 60 minutes total duration..."></textarea>
+                
+                <div class="button-group">
+                    <button class="btn-primary" onclick="getRecommendations()">
+                        ✨ Get AI Recommendations
+                    </button>
+                    <button class="btn-secondary" onclick="clearResults()">
+                        🔄 Clear & Start Over
+                    </button>
+                </div>
+            </div>
+            
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p style="font-size: 1.2em; color: #667eea; font-weight: 600;">
+                    🔍 Analyzing your requirements and finding best assessments...
+                </p>
+            </div>
+            
+            <div class="results" id="results"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000';  // Update with deployed URL
+
+        async function getRecommendations() {
+            const query = document.getElementById('queryInput').value.trim();
+            
+            if (!query) {
+                alert('⚠️ Please enter a job description or search query');
+                return;
+            }
+
+            // Show loading
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+
+            try {
+                const response = await fetch(`${API_URL}/recommend`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: query, use_ai: true })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                displayResults(data);
+            } catch (error) {
+                document.getElementById('results').innerHTML = `
+                    <div class="error-message">
+                        <strong>❌ Error:</strong> ${error.message}
+                        <br><br>
+                        Please make sure the API is running at ${API_URL}
+                    </div>
+                `;
+                document.getElementById('results').style.display = 'block';
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        function displayResults(data) {
+            const recommendations = data.recommendations;
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.style.display = 'block';
+            
+            resultsDiv.innerHTML = `
+                <div class="results-header">
+                    <h2>📊 Top ${recommendations.length} Recommended Assessments</h2>
+                    <div class="results-stats">
+                        <div class="stat-badge">
+                            <div class="stat-label">Total Found</div>
+                            <div class="stat-value">${data.total_found || recommendations.length}</div>
+                        </div>
+                        <div class="stat-badge">
+                            <div class="stat-label">Returned</div>
+                            <div class="stat-value">${recommendations.length}</div>
+                        </div>
+                        <div class="stat-badge">
+                            <div class="stat-label">Category</div>
+                            <div class="stat-value">Individual Tests</div>
+                        </div>
+                    </div>
+                </div>
+
+                ${recommendations.map((rec, idx) => `
+                    <div class="result-card">
+                        <div class="result-header">
+                            <div class="result-rank">${idx + 1}</div>
+                            <div class="result-title">${rec.name}</div>
+                            <div class="result-score">
+                                ${(rec.relevance_score * 100).toFixed(0)}% Match
+                            </div>
+                        </div>
+                        
+                        <div class="result-meta">
+                            <div class="meta-item">
+                                <div class="meta-label">⏱️ Duration</div>
+                                <div class="meta-value">${rec.duration}</div>
+                            </div>
+                            <div class="meta-item">
+                                <div class="meta-label">👤 Job Level</div>
+                                <div class="meta-value">${rec.job_level}</div>
+                            </div>
+                            <div class="meta-item">
+                                <div class="meta-label">📋 Test Type</div>
+                                <div class="meta-value">${rec.test_type}</div>
+                            </div>
+                            <div class="meta-item">
+                                <div class="meta-label">🌐 Remote Testing</div>
+                                <div class="meta-value">${rec.remote_testing}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="result-description">${rec.description}</div>
+                        
+                        ${rec.ai_insights ? `
+                            <div class="ai-insights">
+                                <div class="ai-insights-title">
+                                    <span>🤖</span>
+                                    <strong>AI-Generated Insights</strong>
+                                </div>
+                                <div class="ai-insights-content">${rec.ai_insights}</div>
+                            </div>
+                        ` : ''}
+                        
+                        <a href="${rec.url}" target="_blank" class="result-link">
+                            View Assessment Details
+                            <span>→</span>
+                        </a>
+                    </div>
+                `).join('')}
+            `;
+            
+            // Scroll to results
+            resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function clearResults() {
+            document.getElementById('queryInput').value = '';
+            document.getElementById('results').style.display = 'none';
+        }
+
+        // Example queries
+        const examples = [
+            "I am hiring for Java developers who can also collaborate effectively with my business teams.",
+            "Looking to hire mid-level professionals proficient in Python, SQL and JavaScript.",
+            "Need cognitive and personality tests for analyst position, total duration under 45 minutes."
+        ];
+
+        // Add keyboard shortcut
+        document.getElementById('queryInput').addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') {
+                getRecommendations();
+            }
+        });
+    </script>
+</body>
+</html>
