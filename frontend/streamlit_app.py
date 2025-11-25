@@ -39,7 +39,8 @@ with st.sidebar:
     # API URL input
     api_base_url = st.text_input(
         "API Base URL",
-        value="http://localhost:8000",
+        # value="http://localhost:8000",
+        value = "https://shl-recommendation-system-bfvn.onrender.com",
         help="Enter your API base URL (without /recommend)"
     )
     
