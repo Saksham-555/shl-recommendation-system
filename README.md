@@ -65,6 +65,7 @@ streamlit run frontend/streamlit_app.py
 
 
 ---
+image.png
 
 ## 🛠️ Project Structure
 
